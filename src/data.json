@@ -1,0 +1,9 @@
+{
+  "T1": [{"option": "Stay In"}, {"option": "Try New"}, {"option": "External Activity"}, {"option": "Old Fav"}],
+  "StayIn": [{"option": "Alphabet Movie Series"}, {"option": "Board Game"}, {"option": "Cook a Meal Together"}, {"option": "Video Games Together"}],
+  "ActivityExt": [{"option": "Cidercade"}, {"option": "Movie"}, {"option": "Minigolf"}, {"option":"Escape Room"}, {"option": "Try New"}],
+  "OldFav": [{"option": "Casual"},{"option":"Semi-Formal"}, {"option":"Formal"}],
+  "Casual": [{"option": "Montes"}, {"option": "Fat Boys"}, {"option": "Texas Roadhouse"}],
+  "Semi": [{"option": "Blue Agave"}, {"option": "Sushi"}, {"option": "Hot Pot"}],
+  "Formal": [{"option": "Le'Montes"}, {"option": "Pappadeaux"}, {"option": "Rouxpour"}]
+}
