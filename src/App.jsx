@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { Wheel } from "react-custom-roulette";
 
-import {T1, StayIn, ActivityExt, OldFav, Casual, Semi, Formal } from "./data.json";
+import {
+	T1,
+	StayIn,
+	ActivityExt,
+	OldFav,
+	Casual,
+	Semi,
+	Formal,
+} from "./data.json";
 import "./App.css";
 import { Button } from "@mui/material";
 import Stack from "@mui/material/Stack";
@@ -11,36 +19,30 @@ function App() {
 	const [prizeNumber, setPrizeNumber] = useState(-1);
 	const [outputVal, setOutputVal] = useState("Date Night Idea");
 	const [data, setData] = useState(T1);
-	const [levels, setLevels] = useState([])
+	const [levels, setLevels] = useState([]);
 
 	function updateData() {
-		if(levels.length == 0) {
-			if(data[prizeNumber]["option"].includes("Stay")) {
-				setLevels(levels => [...levels, "StayIn"])
-				setData(StayIn)
+		if (levels.length == 0) {
+			if (data[prizeNumber]["option"].includes("Stay")) {
+				setLevels((levels) => [...levels, "StayIn"]);
+				setData(StayIn);
+			} else if (data[prizeNumber]["option"].includes("Try")) {
+				setLevels((levels) => [...levels, "TryNew"]);
+			} else if (data[prizeNumber]["option"].includes("External")) {
+				setLevels((levels) => [...levels, "ActivityExt"]);
+				setData(ActivityExt);
+			} else {
+				setLevels((levels) => [...levels, "OldFav"]);
+				setData(OldFav);
 			}
-			else if(data[prizeNumber]["option"].includes("Try")) {
-				setLevels(levels => [...levels, "TryNew"])
-			}
-			else if(data[prizeNumber]["option"].includes("External")) {
-				setLevels(levels => [...levels, "ActivityExt"])
-				setData(ActivityExt)
-			}
-			else {
-				setLevels(levels => [...levels, "OldFav"])
-				setData(OldFav)
-			}
-		}
-		else {
-			if(levels.includes("OldFav")) {
-				if(data[prizeNumber]["option"].includes("Casual")) {
-					setData(Casual)
-				}
-				else if(data[prizeNumber]["option"].includes("Semi")) {
-					setData(Semi)
-				}
-				else if(data[prizeNumber]["option"].includes("Formal")) {
-					setData(Formal)
+		} else {
+			if (levels.includes("OldFav")) {
+				if (data[prizeNumber]["option"].includes("Casual")) {
+					setData(Casual);
+				} else if (data[prizeNumber]["option"].includes("Semi")) {
+					setData(Semi);
+				} else if (data[prizeNumber]["option"].includes("Formal")) {
+					setData(Formal);
 				}
 			}
 		}
@@ -55,8 +57,8 @@ function App() {
 	};
 
 	const reload = () => {
-		window.location.reload()
-	}
+		window.location.reload();
+	};
 
 	return (
 		<>
@@ -70,7 +72,13 @@ function App() {
 						updateData();
 						setMustSpin(false);
 					}}
-					backgroundColors={["#30598a", "#72bfed", "#e4dcbd", "#f1b873", "#e27a37"]}
+					backgroundColors={[
+						"#30598a",
+						"#72bfed",
+						"#e4dcbd",
+						"#f1b873",
+						"#e27a37",
+					]}
 					textColors={["#ffffff"]}
 				/>
 				<Button variant="contained" onClick={handleSpinClick}>
