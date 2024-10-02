@@ -1,97 +1,139 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Wheel } from "react-custom-roulette";
-
-import {
-	T1,
-	StayIn,
-	ActivityExt,
-	OldFav,
-	Casual,
-	Semi,
-	Formal,
-} from "./data.json";
+import initialData from "./data.json";
 import "./App.css";
-import { Button } from "@mui/material";
-import Stack from "@mui/material/Stack";
+import { Button, Stack, Box } from "@mui/material";
+import SelectionTree from "./SelectionTree";
+import EditOptionsDialog from "./EditOptionsDialog";
 
 function App() {
-	const [mustSpin, setMustSpin] = useState(false);
-	const [prizeNumber, setPrizeNumber] = useState(-1);
-	const [outputVal, setOutputVal] = useState("Date Night Idea");
-	const [data, setData] = useState(T1);
-	const [levels, setLevels] = useState([]);
+  const [mustSpin, setMustSpin] = useState(false);
+  const [prizeNumber, setPrizeNumber] = useState(-1);
+  const [optionsData, setOptionsData] = useState([]);
+  const [currentOptions, setCurrentOptions] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-	function updateData() {
-		if (levels.length == 0) {
-			if (data[prizeNumber]["option"].includes("Stay")) {
-				setLevels((levels) => [...levels, "StayIn"]);
-				setData(StayIn);
-			} else if (data[prizeNumber]["option"].includes("Try")) {
-				setLevels((levels) => [...levels, "TryNew"]);
-			} else if (data[prizeNumber]["option"].includes("External")) {
-				setLevels((levels) => [...levels, "ActivityExt"]);
-				setData(ActivityExt);
-			} else {
-				setLevels((levels) => [...levels, "OldFav"]);
-				setData(OldFav);
-			}
-		} else {
-			if (levels.includes("OldFav")) {
-				if (data[prizeNumber]["option"].includes("Casual")) {
-					setData(Casual);
-				} else if (data[prizeNumber]["option"].includes("Semi")) {
-					setData(Semi);
-				} else if (data[prizeNumber]["option"].includes("Formal")) {
-					setData(Formal);
-				}
-			}
-		}
-	}
+  useEffect(() => {
+    // Load initial data
+    setOptionsData(initialData);
+    setCurrentOptions(initialData);
+  }, []);
 
-	const handleSpinClick = async () => {
-		if (!mustSpin) {
-			const newPrizeNumber = Math.floor(Math.random() * data.length);
-			setMustSpin(true);
-			setPrizeNumber(newPrizeNumber);
-		}
-	};
+  const handleSpinClick = () => {
+    if (!mustSpin && currentOptions && currentOptions.length > 0) {
+      const newPrizeNumber = Math.floor(Math.random() * currentOptions.length);
+      setPrizeNumber(newPrizeNumber);
+      setMustSpin(true);
+    }
+  };
 
-	const reload = () => {
-		window.location.reload();
-	};
+  const handleSpinComplete = () => {
+    if (currentOptions && currentOptions[prizeNumber]) {
+      const selectedOption = currentOptions[prizeNumber];
+      setSelectedItems((prevItems) => [...prevItems, selectedOption.option]);
+      updateCurrentOptions(selectedOption);
+    }
+    setMustSpin(false);
+  };
 
-	return (
-		<>
-			<Stack spacing={1}>
-				<Wheel
-					mustStartSpinning={mustSpin}
-					prizeNumber={prizeNumber}
-					data={data}
-					onStopSpinning={() => {
-						setOutputVal(data[prizeNumber]["option"]);
-						updateData();
-						setMustSpin(false);
-					}}
-					backgroundColors={[
-						"#30598a",
-						"#72bfed",
-						"#e4dcbd",
-						"#f1b873",
-						"#e27a37",
-					]}
-					textColors={["#ffffff"]}
-				/>
-				<Button variant="contained" onClick={handleSpinClick}>
-					SPIN
-				</Button>
-				<Button variant="contained" color="error" onClick={reload}>
-					RESET
-				</Button>
+  const updateCurrentOptions = (selectedOption) => {
+    if (selectedOption.subOptions && selectedOption.subOptions.length > 0) {
+      setCurrentOptions(selectedOption.subOptions);
+    } else {
+      // Reached a leaf node
+      setCurrentOptions(null);
+    }
+  };
 
-				<p className="textField">{outputVal}</p>
-			</Stack>
-		</>
-	);
+  const reload = () => {
+    // Reset all state variables to their initial values
+    setMustSpin(false);
+    setPrizeNumber(-1);
+    setSelectedItems([]);
+    setCurrentOptions(optionsData);
+  };
+
+  const handleEditClick = () => {
+    setEditDialogOpen(true);
+  };
+
+  const handleEditSave = (updatedData) => {
+    setOptionsData(updatedData);
+    setCurrentOptions(updatedData);
+    setSelectedItems([]);
+    setMustSpin(false);
+    setPrizeNumber(-1);
+    setEditDialogOpen(false);
+  };
+
+  const handleEditCancel = () => {
+    setEditDialogOpen(false);
+  };
+
+  return (
+    <Stack spacing={4} alignItems="center" sx={{ padding: 4 }}>
+      {currentOptions && currentOptions.length > 0 ? (
+        <>
+          <Wheel
+            mustStartSpinning={mustSpin}
+            prizeNumber={prizeNumber}
+            data={currentOptions.map((item) => ({ option: item.option }))}
+            onStopSpinning={handleSpinComplete}
+            backgroundColors={[
+              "#30598a",
+              "#72bfed",
+              "#e4dcbd",
+              "#f1b873",
+              "#e27a37",
+            ]}
+            textColors={["#ffffff"]}
+            perpendicularText={true}
+          />
+          <Button
+            variant="contained"
+            onClick={handleSpinClick}
+            disabled={mustSpin}
+            sx={{ padding: "16px 32px", fontSize: "1.25rem" }}
+          >
+            SPIN
+          </Button>
+        </>
+      ) : (
+        <Box fontSize="1.5rem" fontWeight="bold">
+          No further options available.
+        </Box>
+      )}
+
+      <Button
+        variant="contained"
+        color="error"
+        onClick={reload}
+        sx={{ padding: "16px 32px", fontSize: "1.25rem" }}
+      >
+        RESET
+      </Button>
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleEditClick}
+        sx={{ padding: "16px 32px", fontSize: "1.25rem" }}
+      >
+        EDIT OPTIONS
+      </Button>
+
+      <SelectionTree selectedItems={selectedItems} />
+
+      {/* Edit Options Dialog */}
+      <EditOptionsDialog
+        open={editDialogOpen}
+        onClose={handleEditCancel}
+        onSave={handleEditSave}
+        optionsData={optionsData}
+      />
+    </Stack>
+  );
 }
 
 export default App;
